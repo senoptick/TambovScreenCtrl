@@ -1,76 +1,92 @@
 import os
 import subprocess
 import time
+import socket
+import json
 import gpiod
 from gpiod.line import Direction
 
-
-# ===== НАСТРОЙКИ =====
 GPIO_CHIP = "/dev/gpiochip0"
-GPIO_LINE = 17  # номер GPIO
+GPIO_LINE = 17
+
 BLACK_IMAGE = "black.png"
 VIDEO_FILE = "video.mp4"
 
-# =====================
+MPV_SOCKET = "/tmp/mpvsocket"
 
-current_process = None
-is_black = None  # текущее состояние
+is_black = None
 
-def run_mpv(args):
-    global current_process
 
-    if current_process:
-        current_process.terminate()
-        current_process.wait()
+# ---------- MPV ----------
 
+def start_mpv():
     env = os.environ.copy()
     env["DISPLAY"] = ":0"
 
-    current_process = subprocess.Popen(args, env=env)
+    return subprocess.Popen([
+        "mpv",
+        "--vo=x11",
+        "--fullscreen",
+        "--idle=yes",
+        f"--input-ipc-server={MPV_SOCKET}",
+        BLACK_IMAGE
+    ], env=env)
+
+
+def send_mpv_command(command):
+    if not os.path.exists(MPV_SOCKET):
+        return
+
+    sock = socket.socket(socket.AF_UNIX)
+    sock.connect(MPV_SOCKET)
+
+    sock.send((json.dumps(command) + "\n").encode())
+    sock.close()
+
 
 def show_black():
-    run_mpv([
-        "mpv",
-        "--vo=x11",
-        "--fullscreen",
-        "--image-display-duration=inf",
-        BLACK_IMAGE
-    ])
+    print("Черный экран")
+    send_mpv_command({
+        "command": ["loadfile", BLACK_IMAGE, "replace"]
+    })
+
 
 def play_video():
-    run_mpv([
-        "mpv",
-        "--vo=x11",
-        "--fullscreen",
-        "--loop-file=inf",
-        VIDEO_FILE
-    ])
+    print("Видео")
+    send_mpv_command({
+        "command": ["loadfile", VIDEO_FILE, "replace"]
+    })
 
+
+# ---------- GPIO ----------
 
 def get_line_value(chip_path, line_offset):
     with gpiod.request_lines(
         chip_path,
-        consumer="get-line-value",
+        consumer="limit_switch",
         config={line_offset: gpiod.LineSettings(direction=Direction.INPUT)},
     ) as request:
         value = request.get_value(line_offset)
         return bool(value)
 
 
+# ---------- MAIN ----------
+
 def main():
     global is_black
+
+    mpv_process = start_mpv()
+    time.sleep(1)  # даем mpv стартовать
+
     try:
         while True:
             value = get_line_value(GPIO_CHIP, GPIO_LINE)
-            print("GPIO 17: ", value)
-            
+
             if value == 1 and is_black is not True:
-                print("Концевик замкнут → черный экран")
                 show_black()
                 is_black = True
 
             elif value == 0 and is_black is not False:
-                print("Концевик разомкнут → запуск видео")
                 play_video()
                 is_black = False
 
@@ -78,8 +94,8 @@ def main():
 
     except KeyboardInterrupt:
         print("Выход...")
-        if current_process:
-            current_process.terminate()
+        mpv_process.terminate()
+
 
 if __name__ == "__main__":
     main()
