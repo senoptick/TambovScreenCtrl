@@ -11,41 +11,40 @@ GPIO_LINE = 17  # номер GPIO
 BLACK_IMAGE = "black.png"
 VIDEO_FILE = "video.mp4"
 
-# =====================е
+# =====================
+
 current_process = None
-def start_mpv_controlled():
+is_black = None  # текущее состояние
+
+def run_mpv(args):
     global current_process
-    if current_process is not None:
+
+    if current_process:
         current_process.terminate()
         current_process.wait()
 
     env = os.environ.copy()
     env["DISPLAY"] = ":0"
 
-    current_process = subprocess.Popen([
+    current_process = subprocess.Popen(args, env=env)
+
+def show_black():
+    run_mpv([
         "mpv",
         "--vo=x11",
         "--fullscreen",
-        "--idle=yes",                   # не выходить когда ничего не играет
-        "--loop-playlist=inf",
-        "--keepaspect=no",
-        BLACK_IMAGE, VIDEO_FILE         # оба файла в плейлисте
-    ], env=env, stdin=subprocess.PIPE)
+        "--image-display-duration=inf",
+        BLACK_IMAGE
+    ])
 
-    # даём mpv 1–2 секунды на запуск
-    time.sleep(1.5)
-
-
-def switch_to_black():
-    if current_process and current_process.poll() is None:
-        current_process.stdin.write(b"playlist-play-index 0\n")
-        current_process.stdin.flush()
-
-
-def switch_to_video():
-    if current_process and current_process.poll() is None:
-        current_process.stdin.write(b"playlist-play-index 1\n")
-        current_process.stdin.flush()
+def play_video():
+    run_mpv([
+        "mpv",
+        "--vo=x11",
+        "--fullscreen",
+        "--loop-file=inf",
+        VIDEO_FILE
+    ])
 
 
 def get_line_value(chip_path, line_offset):
@@ -59,26 +58,24 @@ def get_line_value(chip_path, line_offset):
 
 
 def main():
-    start_mpv_controlled()
-
-    
+    global is_black
     try:
         while True:
             value = get_line_value(GPIO_CHIP, GPIO_LINE)
             print("GPIO 17: ", value)
             
-            if value == 1:                    # замкнут → чёрный
-                    if not is_black:
-                        print("→ black")
-                        switch_to_black()
-                        is_black = True
-            else:                             # разомкнут → видео
-                if is_black:
-                    print("→ video")
-                    switch_to_video()
-                    is_black = False
+            if value == 1 and is_black is not True:
+                print("Концевик замкнут → черный экран")
+                show_black()
+                is_black = True
+
+            elif value == 0 and is_black is not False:
+                print("Концевик разомкнут → запуск видео")
+                play_video()
+                is_black = False
 
             time.sleep(0.1)
+
     except KeyboardInterrupt:
         print("Выход...")
         if current_process:
