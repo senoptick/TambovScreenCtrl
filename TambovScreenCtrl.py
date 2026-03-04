@@ -62,7 +62,7 @@ def main():
     try:
         while True:
             value = get_line_value(GPIO_CHIP, GPIO_LINE)
-
+            print("value")
             # value == 0 → замкнут (на GND)
             if value == 0 and is_black is not True:
                 print("Концевик замкнут → черный экран")
