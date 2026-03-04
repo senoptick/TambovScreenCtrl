@@ -18,7 +18,8 @@ def run_command(command):
     current_process = subprocess.Popen(command, shell=True, env={"DISPLAY": ":0"})
 
 def main():
-   run_command(f"mpv --vo=x11 --fullscreen --image-display-duration=inf {BLACK_IMAGE}")
+    print('asd')
+    run_command(f"mpv --vo=x11 --fullscreen --image-display-duration=inf {BLACK_IMAGE}")
     
 if __name__ == "__main__":
     main()
