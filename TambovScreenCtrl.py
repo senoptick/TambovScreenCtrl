@@ -12,7 +12,7 @@ BLACK_IMAGE = "black.png"
 VIDEO_FILE = "video.mp4"
 
 # =====================е
-
+current_process = None
 def start_mpv_controlled():
     global current_process
     if current_process is not None:
