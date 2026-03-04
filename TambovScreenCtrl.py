@@ -28,6 +28,7 @@ def start_mpv():
         "--vo=x11",
         "--fullscreen",
         "--idle=yes",
+        "--loop-file=inf",
         f"--input-ipc-server={MPV_SOCKET}",
         BLACK_IMAGE
     ], env=env)
