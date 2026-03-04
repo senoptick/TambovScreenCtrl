@@ -9,7 +9,7 @@ from gpiod.line import Direction
 GPIO_CHIP = "/dev/gpiochip0"
 GPIO_LINE = 17
 
-BLACK_IMAGE = "black.png"
+BLACK_IMAGE = "black.jpg"
 VIDEO_FILE = "video.mp4"
 
 MPV_SOCKET = "/tmp/mpvsocket"
