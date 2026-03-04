@@ -2,6 +2,8 @@ import os
 import subprocess
 import time
 import gpiod
+from gpiod.line import Direction
+
 
 # ===== НАСТРОЙКИ =====
 GPIO_CHIP = "/dev/gpiochip0"
@@ -44,21 +46,22 @@ def play_video():
         VIDEO_FILE
     ])
 
+
+def get_line_value(chip_path, line_offset):
+    with gpiod.request_lines(
+        chip_path,
+        consumer="get-line-value",
+        config={line_offset: gpiod.LineSettings(direction=Direction.INPUT)},
+    ) as request:
+        value = request.get_value(line_offset)
+        return value
+
+
 def main():
     global is_black
-
-    chip = gpiod.Chip(GPIO_CHIP)
-    line = chip.get_line(GPIO_LINE)
-
-    line.request(consumer="limit_switch",
-                 type=gpiod.LINE_REQ_DIR_IN,
-                 flags=gpiod.LINE_REQ_FLAG_BIAS_PULL_UP)
-
-    print("Система запущена...")
-
     try:
         while True:
-            value = line.get_value()
+            value = get_line_value(GPIO_CHIP, GPIO_LINE)
 
             # value == 0 → замкнут (на GND)
             if value == 0 and is_black is not True:
