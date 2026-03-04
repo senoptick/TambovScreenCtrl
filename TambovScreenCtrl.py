@@ -21,7 +21,7 @@ def run_command(command):
 
 def on_press(key):
     global is_black
-
+    print("asd")
     try:
         if key == keyboard.Key.f12:  # замените на нужную клавишу
             if is_black:
