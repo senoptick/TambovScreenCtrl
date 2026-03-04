@@ -1,5 +1,4 @@
 import subprocess
-from pynput import keyboard
 
 # Флаг для отслеживания состояния
 is_black = True
