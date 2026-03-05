@@ -26,6 +26,7 @@ def start_mpv():
     return subprocess.Popen([
         "mpv",
         "--vo=gpu",
+        "--gpu-context=drm",
         "--fullscreen",
         "--idle=yes",
         "--loop-file=inf",
