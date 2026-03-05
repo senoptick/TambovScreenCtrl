@@ -4,7 +4,7 @@ import time
 import socket
 import json
 import gpiod
-from gpiod.line import Direction
+from gpiod.line import Direction, Bias
 
 GPIO_CHIP = "/dev/gpiochip0"
 GPIO_LINE = 17
