@@ -65,7 +65,7 @@ def get_line_value(chip_path, line_offset):
     with gpiod.request_lines(
         chip_path,
         consumer="limit_switch",
-        config={line_offset: gpiod.LineSettings(direction=Direction.INPUT)},
+        config={line_offset: gpiod.LineSettings(direction=Direction.INPUT, bias=Bias.PULL_UP)},
     ) as request:
         value = request.get_value(line_offset)
         return bool(value)
