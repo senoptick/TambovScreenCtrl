@@ -25,12 +25,10 @@ def start_mpv():
 
     return subprocess.Popen([
         "mpv",
-        "--vo=x11",
+        "--vo=gpu",
         "--fullscreen",
         "--idle=yes",
-        "--ontop",
         "--loop-file=inf",
-        "--cursor-autohide=always",
         f"--input-ipc-server={MPV_SOCKET}",
         BLACK_IMAGE
     ], env=env)
