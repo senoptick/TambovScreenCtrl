@@ -30,6 +30,7 @@ def start_mpv():
         "--idle=yes",
         "--ontop",
         "--loop-file=inf",
+        "--cursor-autohide=always",
         f"--input-ipc-server={MPV_SOCKET}",
         BLACK_IMAGE
     ], env=env)
