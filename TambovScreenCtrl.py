@@ -17,8 +17,6 @@ MPV_SOCKET = "/tmp/mpvsocket"
 is_black = None
 
 
-# ---------- MPV ----------
-
 def start_mpv():
     env = os.environ.copy()
     env["DISPLAY"] = ":0"
@@ -59,8 +57,6 @@ def play_video():
     })
 
 
-# ---------- GPIO ----------
-
 def get_line_value(chip_path, line_offset):
     with gpiod.request_lines(
         chip_path,
@@ -70,8 +66,6 @@ def get_line_value(chip_path, line_offset):
         value = request.get_value(line_offset)
         return bool(value)
 
-
-# ---------- MAIN ----------
 
 def main():
     global is_black
