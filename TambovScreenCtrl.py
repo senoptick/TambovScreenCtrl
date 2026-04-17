@@ -13,7 +13,7 @@ BLACK_IMAGE = "black.jpg"
 VIDEO_FILE = "/content/video.mp4"
 
 MPV_SOCKET = "/tmp/mpvsocket"
-mpv_process = None
+
 is_black = None
 
 
@@ -44,25 +44,14 @@ def send_mpv_command(command):
 
 
 def show_black():
-    global mpv_process
     print("Черный экран")
-    print("Экран ВЫКЛ")
-
-    if mpv_process:
-        mpv_process.terminate()
-        mpv_process.wait()
-        mpv_process = None
-
-    time.sleep(0.5)  # даём GPU освободиться
-
-    with open("/sys/class/graphics/fb0/blank", "w") as f:
-        f.write("1")
+    send_mpv_command({
+        "command": ["loadfile", BLACK_IMAGE, "replace"]
+    })
 
 
 def play_video():
     print("Видео")
-    with open("/sys/class/graphics/fb0/blank", "w") as f:
-        f.write("0")
     send_mpv_command({
         "command": ["loadfile", VIDEO_FILE, "replace"]
     })
@@ -79,8 +68,8 @@ def get_line_value(chip_path, line_offset):
 
 
 def main():
-    global is_black, mpv_process
-    
+    global is_black
+
     mpv_process = start_mpv()
     time.sleep(1)  # даем mpv стартовать
 
