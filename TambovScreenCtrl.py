@@ -44,6 +44,7 @@ def send_mpv_command(command):
 
 
 def show_black():
+    global mpv_process
     print("Черный экран")
     print("Экран ВЫКЛ")
 
