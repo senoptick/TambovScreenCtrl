@@ -13,7 +13,7 @@ BLACK_IMAGE = "black.jpg"
 VIDEO_FILE = "/content/video.mp4"
 
 MPV_SOCKET = "/tmp/mpvsocket"
-
+mpv_process = None
 is_black = None
 
 
@@ -78,8 +78,8 @@ def get_line_value(chip_path, line_offset):
 
 
 def main():
-    global is_black
-
+    global is_black, mpv_process
+    
     mpv_process = start_mpv()
     time.sleep(1)  # даем mpv стартовать
 
