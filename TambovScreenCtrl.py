@@ -45,12 +45,14 @@ def send_mpv_command(command):
 
 def show_black():
     print("Черный экран")
-    os.system("echo 1 | sudo tee /sys/class/graphics/fb0/blank")
+    with open("/sys/class/graphics/fb0/blank", "w") as f:
+        f.write("1")
 
 
 def play_video():
     print("Видео")
-    os.system("echo 0 | sudo tee /sys/class/graphics/fb0/blank")
+    with open("/sys/class/graphics/fb0/blank", "w") as f:
+        f.write("0")
     send_mpv_command({
         "command": ["loadfile", VIDEO_FILE, "replace"]
     })
