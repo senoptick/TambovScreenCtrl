@@ -45,13 +45,12 @@ def send_mpv_command(command):
 
 def show_black():
     print("Черный экран")
-    send_mpv_command({
-        "command": ["loadfile", BLACK_IMAGE, "replace"]
-    })
+    os.system("tvservice -o")
 
 
 def play_video():
     print("Видео")
+    os.system("tvservice -p")
     send_mpv_command({
         "command": ["loadfile", VIDEO_FILE, "replace"]
     })
