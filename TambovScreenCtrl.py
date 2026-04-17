@@ -45,6 +45,15 @@ def send_mpv_command(command):
 
 def show_black():
     print("Черный экран")
+    print("Экран ВЫКЛ")
+
+    if mpv_process:
+        mpv_process.terminate()
+        mpv_process.wait()
+        mpv_process = None
+
+    time.sleep(0.5)  # даём GPU освободиться
+
     with open("/sys/class/graphics/fb0/blank", "w") as f:
         f.write("1")
 
