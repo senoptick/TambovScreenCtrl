@@ -45,12 +45,12 @@ def send_mpv_command(command):
 
 def show_black():
     print("Черный экран")
-    os.system("tvservice -o")
+    os.system("wlr-randr --output HDMI-A-1 --off")
 
 
 def play_video():
     print("Видео")
-    os.system("tvservice -p")
+    os.system("wlr-randr --output HDMI-A-1 --on")
     send_mpv_command({
         "command": ["loadfile", VIDEO_FILE, "replace"]
     })
